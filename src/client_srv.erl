@@ -71,11 +71,13 @@ stop() ->
   gen_server:cast(?SERVER, stop).
 
 test() ->
-    gen_server:call(?SERVER, {gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}).
+    Res = gen_server:call(?SERVER, {gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}),
+    io:format("Response is ~p~n", [Res]).
 
 charge_event(data) ->
   % Data format: {gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToConsumeBytes}}
-  gen_server:call(?SERVER, data).
+  Res = gen_server:call(?SERVER, data),
+  io:format("Response is ~p~n", [Res]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions

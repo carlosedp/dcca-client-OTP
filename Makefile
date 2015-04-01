@@ -1,4 +1,8 @@
-ERL					?= erl
+ifeq ($(OS),Windows_NT)
+        ERL					?= run werl
+else
+        ERL					?= erl
+endif
 ERLC				= erlc
 REBAR 				= escript rebar
 EBIN_DIRS		:= $(wildcard deps/*/ebin)
@@ -71,7 +75,4 @@ checkplt: buildplt
 	@$(REBAR) skip_deps=true check-plt
 
 shell:
-	erl -pa ebin include deps/*/ebin -boot start_sasl -s startapp start
-
-wshell:
-	werl -pa ebin include deps/*/ebin -boot start_sasl -s startapp start &
+	$(ERL) -pa ebin include deps/*/ebin -boot start_sasl -s startapp start
