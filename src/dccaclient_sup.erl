@@ -23,7 +23,7 @@ start_link() ->
 %% ===================================================================
 
 init([]) ->
-    DiaClient = {dccaclient,{client_srv,start_link,[]},
+    DiaClient = {dccaclient,{dccaclient,start_link,[]},
                  permanent,
                  5000,
                  worker,

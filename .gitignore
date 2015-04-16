@@ -1,6 +1,7 @@
 ebin/*
 *.beam
 deps/*
+log/*
 erl_crash.dump
 src/rfc4006_cc_Gy.erl
 include/rfc4006_cc_Gy.hrl

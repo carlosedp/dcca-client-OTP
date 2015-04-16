@@ -3,7 +3,7 @@
 %% @doc gen_server callback module implementation:
 %%
 %% @end
--module(client_srv).
+-module(dccaclient).
 -author('Carlos Eduardo de Paula <carlosedp@gmail.com>').
 
 -behaviour(gen_server).
@@ -17,7 +17,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 -export([start_link/0]).
--export([stop/0, terminate/2]).
+-export([start/0, stop/0, terminate/2]).
 -export([test/0, charge_event/1]).
 
 %% ------------------------------------------------------------------
@@ -65,19 +65,29 @@ start_link() ->
   % gen_server:start_link(?MODULE, [], []). % for unnamed gen_server
   gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
+%% @doc starts gen_server implementation process
+-spec start()
+   -> ok
+    | {error, term()}.
+
+start() ->
+    start_link().
+
 %% @doc stops gen_server implementation process
 -spec stop() -> ok.
 stop() ->
   gen_server:cast(?SERVER, stop).
 
+%% @doc Generate a test event
 test() ->
     Res = gen_server:call(?SERVER, {gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}),
-    io:format("Response is ~p~n", [Res]).
+    lager:info("Response is ~p~n", [Res]).
 
+%% @doc Charges event
 charge_event(data) ->
   % Data format: {gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToConsumeBytes}}
   Res = gen_server:call(?SERVER, data),
-  io:format("Response is ~p~n", [Res]).
+  lager:info("Response is ~p~n", [Res]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
@@ -96,11 +106,11 @@ handle_call({gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToCon
     Ret = create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}),
     case Ret of
         {ok, _} ->
-            io:format("CCR-INITIAL Success...~n"),
+            lager:info("CCR-INITIAL Success..."),
             rate_service(gprs, {update, MSISDN, IMSI, SessionId, ReqN, {ServiceId, RatingGroup, 0, VolumeBytes}, TimeToConsumeBytes}),
-            io:format("Event charged successfully.~n");
+            lager:info("Event charged successfully.");
         {error, Err} ->
-            io:format("Error: ~w~n", [Err])
+            lager:error("Error: ~w~n", [Err])
     end,
   {reply, ok, State}.
 
@@ -199,7 +209,7 @@ rate_service(gprs, {update, MSISDN, IMSI, SessionId, ReqN, {ServiceId, RatingGro
     Ret = diameter:call(?SVC_NAME, ?APP_ALIAS, CCR2, []),
     case Ret of
         {ok, CCA} ->
-            io:format("CCR-UPDATE Success...~n"),
+            lager:info("CCR-UPDATE Success..."),
             %% Extract GSU from CCA
             #'CCA'{
                   'Multiple-Services-Credit-Control' = MSCC
@@ -217,11 +227,11 @@ rate_service(gprs, {update, MSISDN, IMSI, SessionId, ReqN, {ServiceId, RatingGro
                 NewRemainingBytes when NewRemainingBytes > 0 ->
                     rate_service(gprs, {update, MSISDN, IMSI, SessionId, ReqN2, {ServiceId, RatingGroup, UsedUnits, NewRemainingBytes}, TimeToConsumeBytes});
                 NewRemainingBytes when NewRemainingBytes =< 0 ->
-                    io:format("Last request: ~w | ~w | ~w ~n", [UsedUnits, RemainingBytes, NewRemainingBytes]),
+                    lager:info("Last request: ~w | ~w | ~w ~n", [UsedUnits, RemainingBytes, NewRemainingBytes]),
                     rate_service(gprs, {terminate, MSISDN, IMSI, SessionId, ReqN2, {ServiceId, RatingGroup, RemainingBytes, 0}, TimeToConsumeBytes})
             end;
         {error, Err} ->
-            io:format("Error: ~w~n", [Err])
+            lager:error("Error: ~w~n", [Err])
     end,
     ok;
 
@@ -247,9 +257,9 @@ rate_service(gprs, {terminate, MSISDN, IMSI, SessionId, ReqN, {ServiceId, Rating
     Ret = diameter:call(?SVC_NAME, ?APP_ALIAS, CCR2, []),
     case Ret of
         {ok, _} ->
-            io:format("CCR-TERMINATE Success...~n");
+            lager:info("CCR-TERMINATE Success...");
         {error, Err} ->
-            io:format("Error: ~w~n", [Err])
+            lager:error("Error: ~w~n", [Err])
     end,
     ok.
 

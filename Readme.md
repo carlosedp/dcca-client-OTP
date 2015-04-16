@@ -32,14 +32,14 @@ The accepted commands are:
 
 ### Test DCCA with a simulated event
 
-    client_srv:test().
+    dccaclient:test().
 
 ### Simulate with your own values
 
-    client_srv:charge_event({gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToWait}}).
+    dccaclient:charge_event({gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToWait}}).
     
     ex:
-    client_srv:charge_event({gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}).
+    dccaclient:charge_event({gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}).
 
 **Where:**
 

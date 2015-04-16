@@ -62,7 +62,7 @@ prepare_retransmit(Packet, SvcName, Peer) ->
 
 handle_answer(#diameter_packet{msg = Msg}, Request, _SvcName, _Peer)
     when is_list(Request) ->
-        io:format("CCA: ~p~n", [Msg]),
+        lager:info("CCA: ~p~n", [Msg]),
         {ok, Msg};
 
 handle_answer(#diameter_packet{msg = Msg}, _Request, _SvcName, _Peer) ->
@@ -71,7 +71,7 @@ handle_answer(#diameter_packet{msg = Msg}, _Request, _SvcName, _Peer) ->
 %% handle_error/4
 handle_error(Reason, Request, _SvcName, _Peer)
     when is_list(Request) ->
-        %io:format("error: ~p~n", [Reason])
+        lager:error("error: ~p~n", [Reason]),
         {error, Reason};
 
 handle_error(Reason, _Request, _SvcName, _Peer) ->

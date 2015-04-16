@@ -56,14 +56,11 @@ restart: $(SCRIPT_PATH)
 reboot: $(SCRIPT_PATH)
 	@./$(SCRIPT_PATH) reboot
 
-#doc:
-#	$(REBAR) skip_deps=true doc
-#	for app in $(APPS); do \
-#		cp -R apps/$${app}/doc doc/$${app}; \
-#	done;
-
-dev:
-	@erl -pa ebin include deps/*/ebin deps/*/include ebin include -boot start_sasl
+doc:
+	$(REBAR) skip_deps=true doc
+	for app in $(APPS); do \
+		cp -R apps/$${app}/doc doc/$${app}; \
+	done;
 
 analyze: checkplt
 	@$(REBAR) skip_deps=true dialyze
@@ -75,4 +72,4 @@ checkplt: buildplt
 	@$(REBAR) skip_deps=true check-plt
 
 shell:
-	$(ERL) -pa ebin include deps/*/ebin -boot start_sasl -s startapp start
+	$(ERL) -pa ebin deps/*/ebin -boot start_sasl -s lager -s diameter -s dccaclient

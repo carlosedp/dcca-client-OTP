@@ -7,6 +7,8 @@
   {applications, [
                   kernel,
                   stdlib,
+                  lager,
+                  sasl,
                   diameter
                  ]},
   {mod, { dccaclient_app, []}},
