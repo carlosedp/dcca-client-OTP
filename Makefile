@@ -1,6 +1,4 @@
 APP					= dccaclient
-ERLAPPS				= -s dccaclient
-ERLDEPS				= -s lager -s diameter
 COOKIE				= 'abc123'
 ERLC				= erlc
 REBAR 				= escript rebar
@@ -85,4 +83,4 @@ xref: compile
 	${REBAR} xref skip_deps=true
 
 shell:
-	$(ERL) -pa deps/*/ebin ebin -sname $(APP) -setcookie $(COOKIE) -boot start_sasl $(ERLDEPS) $(ERLAPPS)
+	$(ERL) -pa deps/*/ebin apps/*/ebin -sname $(APP) -setcookie $(COOKIE) -boot start_sasl -s $(APP)
