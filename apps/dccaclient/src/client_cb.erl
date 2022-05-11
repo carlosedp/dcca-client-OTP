@@ -4,8 +4,7 @@
 -module(client_cb).
 
 -include_lib("diameter/include/diameter.hrl").
--include_lib("diameter/include/diameter_gen_base_rfc6733.hrl").
--include_lib("include/rfc4006_cc_Gy.hrl").
+-include_lib("../include/rfc4006_cc_Gy.hrl").
 
 %% diameter callbacks
 -export([peer_up/3, peer_down/3, pick_peer/4, prepare_request/3, prepare_retransmit/3,

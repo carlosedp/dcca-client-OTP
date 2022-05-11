@@ -9,10 +9,8 @@
 
 -behaviour(gen_server).
 
--include_lib("diameter/include/diameter.hrl").
--include_lib("diameter/include/diameter_gen_base_rfc6733.hrl").
--include_lib("include/rfc4006_cc_Gy.hrl").
--include_lib("diameter_settings.hrl").
+-include_lib("../include/rfc4006_cc_Gy.hrl").
+-include_lib("../include/diameter_settings.hrl").
 
 %% ------------------------------------------------------------------
 %% API Function Exports
@@ -26,15 +24,14 @@
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2]).
 -export([code_change/3]).
 
-% TODO: If unnamed server, remove definition below.
--define(SERVER, ?MODULE).
 %%%.
 %%%'   Diameter Application Definitions
+%%%.
+-define(SERVER, ?MODULE).
 -define(SVC_NAME, ?MODULE).
 -define(APP_ALIAS, ?MODULE).
 -define(CALLBACK_MOD, client_cb).
 -define(DIAMETER_DICT_CCRA, rfc4006_cc_Gy).
--define(L, atom_to_list).
 %% The service configuration. As in the server example, a client
 %% supporting multiple Diameter applications may or may not want to
 %% configure a common callback module on all applications.
@@ -101,7 +98,7 @@ handle_call({gprs,
              {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToConsumeBytes}},
             _From,
             State) ->
-    SessionId = diameter:session_id(?L(?SVC_NAME)),
+    SessionId = diameter:session_id(atom_to_list(?SVC_NAME)),
     ReqN = 0,
     % Generate initial CCR without MSCC
     Ret = create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}),
