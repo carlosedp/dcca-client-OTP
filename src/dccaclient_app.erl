@@ -6,6 +6,7 @@
 %% @end
 
 -module(dccaclient_app).
+
 -behaviour(application).
 
 %% Application callbacks

@@ -1,8 +1,32 @@
-ebin/*
+# Build files
+_*
+*.o
 *.beam
-deps/*
-log/*
+*.plt
+*.swp
+*.swo
+.rebar3
+.eunit
+.erlang.cookie
+.rebar
+_rel
+_deps
+_plugins
+_tdeps
+_build
+logs
+ebin
+log
+doc
+tmp
+
+# Dumps
 erl_crash.dump
+rebar3.crashdump
+
+# Generated files
 src/rfc4006_cc_Gy.erl
 include/rfc4006_cc_Gy.hrl
-.rebar/erlcinfo
+
+# Downloaded files
+rebar3
