@@ -1,26 +1,22 @@
 # Erlang Diameter Credit Control Client
 
-This repository contains an example OTP DCCA application client built in Erlang.
+This repository contains an example OTP DCCA application client built in Erlang. It's used as a companion to the [DCCA-server-OTP](https://github.com/carlosedp/dcca-server-OTP) application.
+
+To run the commands, you need [rebar3](https://rebar3.org/docs/getting-started/) that can be either installed into the system (for example using Brew on Mac) or downloaded into the current application diretory (with execution permission).
+
 
 To build the modules and diameter dictionaries, use rebar:
 
-    ./rebar get-deps compile
+    rebar3 compile
 
 or
 
-    make all
+    make
 
-To start the module use:
+To start the module use (the DCCA server must be up already):
 
-    erl -pa deps/ebin ebin
-    
-    application:start(diameter).
-    application:start(dccaclient).
-
-Or use the provided Makefile:
-
-    make compile
     make shell
+    dccaclient:test().  # This will use a simulated event
 
 on Windows, use `make wshell`.
 
@@ -37,9 +33,11 @@ The accepted commands are:
 ### Simulate with your own values
 
     dccaclient:charge_event({gprs, {MSISDN, IMSI, ServiceId, RatingGroup, VolumeBytes, TimeToWait}}).
-    
+
     ex:
     dccaclient:charge_event({gprs, {"5511985231234", "72412345678912", 1, 100, 1000000, 1}}).
+
+To exit, type Ctrl+G to call the Erlang shell followed by the command "q".
 
 **Where:**
 
