@@ -9,8 +9,8 @@
 
 -behaviour(gen_server).
 
--include_lib("../include/rfc4006_cc_Gy.hrl").
--include_lib("../include/diameter_settings.hrl").
+-include_lib("rfc4006_cc_Gy.hrl").
+-include_lib("diameter_settings.hrl").
 
 %% ------------------------------------------------------------------
 %% API Function Exports
@@ -36,9 +36,9 @@
 %% supporting multiple Diameter applications may or may not want to
 %% configure a common callback module on all applications.
 -define(SERVICE(Name),
-        [{'Origin-Host', application:get_env(dccaclient, origin_host)},
-         {'Origin-Realm', application:get_env(dccaclient, origin_realm)},
-         {'Vendor-Id', application:get_env(dccaclient, vendor_id)},
+        [{'Origin-Host', application:get_env(?SERVER, origin_host, "default.com")},
+         {'Origin-Realm', application:get_env(?SERVER, origin_realm, "realm.default.com")},
+         {'Vendor-Id', application:get_env(?SERVER, vendor_id, 0)},
          {'Product-Name', "Client"},
          {'Auth-Application-Id', [?DCCA_APPLICATION_ID]},
          {application,
@@ -85,9 +85,9 @@ charge_event(data) ->
 %% ------------------------------------------------------------------
 
 init(State) ->
-    Ip = application:get_env(dccaclient, diameter_server_ip),
-    Port = application:get_env(dccaclient, diameter_port),
-    Proto = application:get_env(dccaclient, diameter_proto),
+    Proto = application:get_env(?SERVER, diameter_proto, tcp),
+    Ip = application:get_env(?SERVER, diameter_server_ip, "127.0.0.1"),
+    Port = application:get_env(?SERVER, diameter_port, 3868),
 
     diameter:start_service(?MODULE, ?SERVICE(Name)),
     connect({address, Proto, Ip, Port}),
@@ -173,7 +173,7 @@ tmod(sctp) ->
 create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}) ->
     CCR = #'CCR'{'Session-Id' = SessionId,
                  'Auth-Application-Id' = 4,
-                 'Service-Context-Id' = application:get_env(dccaclient, context_id),
+                 'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
                  'CC-Request-Type' = ?CCR_INITIAL,
                  'CC-Request-Number' = ReqN,
                  'Event-Timestamp' =
@@ -201,7 +201,7 @@ rate_service(gprs,
     CCR2 =
         CCR1#'CCR'{'Session-Id' = SessionId,
                    'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
-                   'Service-Context-Id' = application:get_env(dccaclient, context_id),
+                   'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
                    'CC-Request-Type' = ?CCR_UPDATE,
                    'CC-Request-Number' = ReqN2,
                    'Event-Timestamp' =
@@ -263,7 +263,7 @@ rate_service(gprs,
     CCR2 =
         CCR1#'CCR'{'Session-Id' = SessionId,
                    'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
-                   'Service-Context-Id' = application:get_env(dccaclient, context_id),
+                   'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
                    'CC-Request-Type' = ?CCR_TERMINATE,
                    'CC-Request-Number' = ReqN + 1,
                    'Event-Timestamp' =
