@@ -28,10 +28,8 @@
 
 % TODO: If unnamed server, remove definition below.
 -define(SERVER, ?MODULE).
-
 %%%.
 %%%'   Diameter Application Definitions
-
 -define(SVC_NAME, ?MODULE).
 -define(APP_ALIAS, ?MODULE).
 -define(CALLBACK_MOD, client_cb).
@@ -41,9 +39,9 @@
 %% supporting multiple Diameter applications may or may not want to
 %% configure a common callback module on all applications.
 -define(SERVICE(Name),
-        [{'Origin-Host', ?ORIGIN_HOST},
-         {'Origin-Realm', ?ORIGIN_REALM},
-         {'Vendor-Id', ?VENDOR_ID},
+        [{'Origin-Host', application:get_env(dccaclient, origin_host)},
+         {'Origin-Realm', application:get_env(dccaclient, origin_realm)},
+         {'Vendor-Id', application:get_env(dccaclient, vendor_id)},
          {'Product-Name', "Client"},
          {'Auth-Application-Id', [?DCCA_APPLICATION_ID]},
          {application,
@@ -90,8 +88,12 @@ charge_event(data) ->
 %% ------------------------------------------------------------------
 
 init(State) ->
+    Ip = application:get_env(dccaclient, diameter_server_ip),
+    Port = application:get_env(dccaclient, diameter_port),
+    Proto = application:get_env(dccaclient, diameter_proto),
+
     diameter:start_service(?MODULE, ?SERVICE(Name)),
-    connect({address, ?DIAMETER_PROTO, ?DIAMETER_IP, ?DIAMETER_PORT}),
+    connect({address, Proto, Ip, Port}),
     {ok, State}.
 
 %% @callback gen_server
@@ -174,7 +176,7 @@ tmod(sctp) ->
 create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}) ->
     CCR = #'CCR'{'Session-Id' = SessionId,
                  'Auth-Application-Id' = 4,
-                 'Service-Context-Id' = "gprs@diameter.com",
+                 'Service-Context-Id' = application:get_env(dccaclient, context_id),
                  'CC-Request-Type' = ?CCR_INITIAL,
                  'CC-Request-Number' = ReqN,
                  'Event-Timestamp' =
@@ -202,7 +204,7 @@ rate_service(gprs,
     CCR2 =
         CCR1#'CCR'{'Session-Id' = SessionId,
                    'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
-                   'Service-Context-Id' = ?CONTEXT_ID,
+                   'Service-Context-Id' = application:get_env(dccaclient, context_id),
                    'CC-Request-Type' = ?CCR_UPDATE,
                    'CC-Request-Number' = ReqN2,
                    'Event-Timestamp' =
@@ -264,7 +266,7 @@ rate_service(gprs,
     CCR2 =
         CCR1#'CCR'{'Session-Id' = SessionId,
                    'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
-                   'Service-Context-Id' = ?CONTEXT_ID,
+                   'Service-Context-Id' = application:get_env(dccaclient, context_id),
                    'CC-Request-Type' = ?CCR_TERMINATE,
                    'CC-Request-Number' = ReqN + 1,
                    'Event-Timestamp' =
