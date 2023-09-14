@@ -1,16 +1,15 @@
 %-*- mode: erlang -*-
-{application, dccaclient,
- [
-  {description, "Diameter DCCA Client"},
-  {vsn, "1"},
-  {registered, []},
-  {applications, [
-                  kernel,
-                  stdlib,
-                  lager,
-                  sasl,
-                  diameter
-                 ]},
-  {mod, { dccaclient_app, []}},
-  {env, []}
- ]}.
+{application, dccaclient, [
+    {description, "Diameter DCCA Client"},
+    {vsn, "1"},
+    {registered, []},
+    {applications, [
+        kernel,
+        stdlib,
+        lager,
+        sasl,
+        diameter
+    ]},
+    {mod, {dccaclient_app, []}},
+    {env, []}
+]}.
