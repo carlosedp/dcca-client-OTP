@@ -182,6 +182,15 @@ tmod(tcp) ->
 tmod(sctp) ->
     diameter_sctp.
 
+%% Convert IP address to binary
+ip2bin({A, B, C, D}) ->
+    <<A, B, C, D>>;
+ip2bin(Bin) when is_binary(Bin) ->
+    Bin;
+ip2bin(Ip) when is_list(Ip) ->
+    {ok, IP} = inet_parse:address(Ip),
+    ip2bin(IP).
+
 %% Create the PDP context. First CCR does not contain MSCC
 create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}) ->
     CCR = #'CCR'{
@@ -189,6 +198,7 @@ create_session(gprs, {initial, MSISDN, IMSI, SessionId, ReqN}) ->
         'Auth-Application-Id' = 4,
         'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
         'CC-Request-Type' = ?CCR_INITIAL,
+        'Framed-IP-Address' = [ip2bin("1.2.3.4")],
         'CC-Request-Number' = ReqN,
         'Event-Timestamp' =
             [
@@ -225,6 +235,7 @@ rate_service(
             'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
             'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
             'CC-Request-Type' = ?CCR_UPDATE,
+            'Framed-IP-Address' = [ip2bin("1.2.3.4")],
             'CC-Request-Number' = ReqN2,
             'Event-Timestamp' =
                 [
@@ -292,6 +303,7 @@ rate_service(
             'Auth-Application-Id' = ?DCCA_APPLICATION_ID,
             'Service-Context-Id' = application:get_env(?SERVER, context_id, "context@dcca"),
             'CC-Request-Type' = ?CCR_TERMINATE,
+            'Framed-IP-Address' = [ip2bin("1.2.3.4")],
             'CC-Request-Number' = ReqN + 1,
             'Event-Timestamp' =
                 [
